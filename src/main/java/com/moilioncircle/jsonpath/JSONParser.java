@@ -30,15 +30,11 @@ public class JSONParser {
     private final BufferedReader reader;
 
     public JSONParser(InputStream stream, Charset encoding, boolean isOrdered) throws IOException {
-        this(new BufferedReader(new InputStreamReader(stream, encoding)), isOrdered);
+        this(new InputStreamReader(stream, encoding), isOrdered);
     }
 
-    public JSONParser(String str, boolean isOrdered) throws IOException {
-        this(new BufferedReader(new StringReader(str)), isOrdered);
-    }
-
-    private JSONParser(BufferedReader reader, boolean isOrdered) throws IOException {
-        this.reader = reader;
+    public JSONParser(Reader reader, boolean isOrdered) throws IOException {
+        this.reader = new BufferedReader(reader);
         this.isOrdered = isOrdered;
         curr = next();
     }
@@ -230,7 +226,6 @@ public class JSONParser {
             switch (curr) {
                 case QUOTE:
                     next();
-                    System.out.println(curr);
                     return builder.toString();
                 case '\\':
                     next();
@@ -318,8 +313,11 @@ public class JSONParser {
     }
 
     public static void main(String[] args) throws IOException {
-        JSONParser parser = new JSONParser(new ByteArrayInputStream("[true,[\"测试中文\"],[null], [ 0 , 1.23, 4,{\"abc\":\"bcd\" , \"123\":345} ]]".getBytes()), Charset.defaultCharset(), true);
-        System.out.println(parser.parse());
+        try (InputStream stream = new ByteArrayInputStream("[true,[\"测试中文\"],[null], [ 0 , 1.23, 4,{\"abc\":\"bcd\" , \"123\":345} ]]".getBytes())) {
+            JSONParser parser = new JSONParser(stream, Charset.defaultCharset(), true);
+            System.out.println(parser.parse());
+        }
+
     }
 
 }

@@ -1,6 +1,7 @@
 package com.moilioncircle.jsonpath;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -152,11 +153,14 @@ public class JSONPointer {
     }
 
     public static void main(String[] args) throws IOException {
-        JSONParser parser = new JSONParser("[{\"http://test.com/测试\":true},[\"测试中文\"],[null], [ 0 , 1.23, 4,{\"abc\":\"bcd\" , \"123\":345} ]]", true);
-        JSONPointer pointer = new JSONPointer(parser.parse());
-        Boolean bool = pointer.read("/0/" + quote("http://test.com/测试"));
-        System.out.println(bool);
-        bool = pointer.read("/0/http:~1~1test.com~1测试");
-        System.out.println(bool);
+        try (StringReader reader = new StringReader("[{\"http://test.com/测试\":true},[\"测试中文\"],[null], [ 0 , 1.23, 4,{\"abc\":\"bcd\" , \"123\":345} ]]")) {
+            JSONParser parser = new JSONParser(reader, true);
+            JSONPointer pointer = new JSONPointer(parser.parse());
+            Boolean bool = pointer.read("/0/" + quote("http://test.com/测试"));
+            System.out.println(bool);
+            bool = pointer.read("/0/http:~1~1test.com~1测试");
+            System.out.println(bool);
+        }
+
     }
 }
