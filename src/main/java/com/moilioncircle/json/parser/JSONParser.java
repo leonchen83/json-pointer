@@ -1,10 +1,8 @@
-package com.moilioncircle.jsonpath;
+package com.moilioncircle.json.parser;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
-
-import static com.moilioncircle.jsonpath.Constant.*;
 
 /**
  * Copyright leon
@@ -24,79 +22,82 @@ import static com.moilioncircle.jsonpath.Constant.*;
  * @author leon on 15-11-11
  */
 public class JSONParser {
+
     private char curr;
+
     private final StringBuilder builder = new StringBuilder();
+
     private final boolean isOrdered;
+
     private final BufferedReader reader;
 
-    public JSONParser(InputStream stream, Charset encoding, boolean isOrdered) throws IOException {
+    public JSONParser(InputStream stream, Charset encoding, boolean isOrdered) {
         this(new InputStreamReader(stream, encoding), isOrdered);
     }
 
-    public JSONParser(Reader reader, boolean isOrdered) throws IOException {
+    public JSONParser(Reader reader, boolean isOrdered) {
         this.reader = new BufferedReader(reader);
         this.isOrdered = isOrdered;
-        curr = next();
     }
 
-    public JSONType parse() throws IOException {
+    public JSONType parse() throws IOException, JSONParserException {
         JSONType object;
+        curr = next();
         switch (curr) {
-            case LBRACE:
-                accept(LBRACE);
+            case Constant.LBRACE:
+                next();
                 object = parseObject();
-                accept(EOF);
                 break;
-            case LBRACKET:
-                accept(LBRACKET);
+            case Constant.LBRACKET:
+                next();
                 object = parseArray();
-                accept(EOF);
                 break;
             default:
-                throw new RuntimeException();
+                throw new JSONParserException("Expected '{','[' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
         }
+        accept(Constant.EOF);
         return object;
     }
 
-    public JSONObject parseObject() throws IOException {
+    public JSONObject parseObject() throws IOException, JSONParserException {
         JSONObject object = new JSONObject(isOrdered);
         switch (curr) {
-            case RBRACE:
-                accept(RBRACE);
+            case Constant.RBRACE:
+                next();
                 return object;
-            case QUOTE:
+            case Constant.QUOTE:
                 do {
                     String key = parseString();
-                    accept(COLON);
+                    accept(Constant.COLON);
                     Object value = parseValue();
                     object.put(key, value);
-                } while (nextIfAccept(COMMA));
-                accept(RBRACE);
+                } while (nextIfAccept(Constant.COMMA));
+                accept(Constant.RBRACE);
                 return object;
             default:
-                throw new RuntimeException();
+                throw new JSONParserException("Expected '}','\"' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
         }
     }
 
-    public JSONArray parseArray() throws IOException {
+    public JSONArray parseArray() throws IOException, JSONParserException {
         JSONArray array = new JSONArray();
         switch (curr) {
-            case RBRACKET:
-                accept(RBRACKET);
+            case Constant.RBRACKET:
+                next();
                 return array;
             default:
                 do {
                     Object value = parseValue();
                     array.add(value);
-                } while (nextIfAccept(COMMA));
-                accept(RBRACKET);
+                } while (nextIfAccept(Constant.COMMA));
+                accept(Constant.RBRACKET);
                 return array;
         }
     }
 
-    private Object parseValue() throws IOException {
+    private Object parseValue() throws IOException, JSONParserException {
         switch (curr) {
-            case QUOTE:
+            case Constant.QUOTE:
                 return parseString();
             case 't':
                 accept('t');
@@ -117,10 +118,10 @@ public class JSONParser {
                 accept('l');
                 accept('l');
                 return null;
-            case LBRACE:
+            case Constant.LBRACE:
                 next();
                 return parseObject();
-            case LBRACKET:
+            case Constant.LBRACKET:
                 next();
                 return parseArray();
             case '0':
@@ -135,11 +136,12 @@ public class JSONParser {
             case '9':
             case '-':
                 return parseNumber();
+            default:
+                throw new JSONParserException("Expected '{','[','t','f','n','\"','-','0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
         }
-        throw new RuntimeException();
     }
 
-    private Object parseNumber() throws IOException {
+    private Object parseNumber() throws IOException, JSONParserException {
         builder.setLength(0);
         switch (curr) {
             case '-':
@@ -168,21 +170,34 @@ public class JSONParser {
                 }
                 break;
             default:
+                throw new JSONParserException("Expected '0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
         }
         switch (curr) {
             case '.':
                 builder.append('.');
-                if (next() >= '0' && curr <= '9') {
-                    builder.append(curr);
-                } else {
-                    throw new RuntimeException();
-                }
-                while (next() >= '0' && curr <= '9') {
-                    builder.append(curr);
+                next();
+                switch (curr) {
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        builder.append(curr);
+                        while (next() >= '0' && curr <= '9') {
+                            builder.append(curr);
+                        }
+                        break;
+                    default:
+                        throw new JSONParserException("Expected '0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+
                 }
                 break;
             default:
-
         }
         switch (curr) {
             case 'e':
@@ -193,6 +208,24 @@ public class JSONParser {
                     case '+':
                     case '-':
                         builder.append(curr);
+                        next();
+                        switch (curr) {
+                            case '0':
+                            case '1':
+                            case '2':
+                            case '3':
+                            case '4':
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '9':
+                                builder.append(curr);
+                                break;
+                            default:
+                                throw new JSONParserException("Expected '0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+
+                        }
                         break;
                     case '0':
                     case '1':
@@ -207,7 +240,7 @@ public class JSONParser {
                         builder.append(curr);
                         break;
                     default:
-                        throw new RuntimeException();
+                        throw new JSONParserException("Expected '+','-','0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
                 }
                 while (next() >= '0' && curr <= '9') {
                     builder.append(curr);
@@ -218,19 +251,19 @@ public class JSONParser {
         return new BigDecimal(builder.toString());
     }
 
-    private String parseString() throws IOException {
+    private String parseString() throws IOException, JSONParserException {
         builder.setLength(0);
         loop:
         while (true) {
-            next();
+            next0();
             switch (curr) {
-                case QUOTE:
+                case Constant.QUOTE:
                     next();
                     return builder.toString();
                 case '\\':
-                    next();
+                    next0();
                     switch (curr) {
-                        case QUOTE:
+                        case Constant.QUOTE:
                             builder.append('\"');
                             continue loop;
                         case '\\':
@@ -256,20 +289,22 @@ public class JSONParser {
                             builder.append('/');
                             continue loop;
                         case 'u':
-                            int s = Integer.valueOf(new String(new char[]{next(), next(), next(), next()}), 16);
+                            int s = Integer.valueOf(new String(new char[]{next0(), next0(), next0(), next0()}), 16);
                             builder.append((char) s);
                             continue loop;
                         default:
-                            builder.append('\\');
-                            builder.append(curr);
-                            continue loop;
+                            throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but "+(curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
                     }
-                case EOF:
-                    throw new RuntimeException();
+                case Constant.EOF:
+                case '\n':
+                case '\t':
+                case '\r':
+                case '\f':
+                case '\b':
+                    throw new JSONParserException("Un-closed String");
                 default:
                     builder.append(curr);
                     continue loop;
-
             }
         }
     }
@@ -284,8 +319,8 @@ public class JSONParser {
                 case '\t':
                 case '\r':
                     continue loop;
-                case EOF:
-                    curr = EOF;
+                case Constant.EOF:
+                    curr = Constant.EOF;
                     break loop;
                 default:
                     curr = c;
@@ -295,11 +330,16 @@ public class JSONParser {
         return curr;
     }
 
-    private void accept(char c) throws IOException {
+    private char next0() throws IOException {
+        curr = (char) reader.read();
+        return curr;
+    }
+
+    private void accept(char c) throws IOException, JSONParserException {
         if (c == curr) {
             next();
         } else {
-            throw new RuntimeException();
+            throw new JSONParserException("Expected '" + c + "' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
         }
     }
 
@@ -312,8 +352,8 @@ public class JSONParser {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        try (InputStream stream = new ByteArrayInputStream("[true,[\"测试中文\"],[null], [ 0 , 1.23, 4,{\"abc\":\"bcd\" , \"123\":345} ]]".getBytes())) {
+    public static void main(String[] args) throws IOException, JSONParserException {
+        try (InputStream stream = new ByteArrayInputStream("[\"  \"]".getBytes())) {
             JSONParser parser = new JSONParser(stream, Charset.defaultCharset(), true);
             System.out.println(parser.parse());
         }

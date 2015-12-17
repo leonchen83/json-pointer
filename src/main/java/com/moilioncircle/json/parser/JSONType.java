@@ -1,4 +1,4 @@
-package com.moilioncircle.jsonpath;
+package com.moilioncircle.json.parser;
 
 /**
  * Copyright leon
@@ -17,13 +17,5 @@ package com.moilioncircle.jsonpath;
  *
  * @author leon on 15-11-11
  */
-public class Constant {
-    public static final char LBRACE = '{';
-    public static final char RBRACE = '}';
-    public static final char COLON = ':';
-    public static final char COMMA = ',';
-    public static final char LBRACKET = '[';
-    public static final char RBRACKET = ']';
-    public static final char QUOTE = '"';
-    public static final char EOF = '\uFFFF';
+public interface JSONType {
 }
