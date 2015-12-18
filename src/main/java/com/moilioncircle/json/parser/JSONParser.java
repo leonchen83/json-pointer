@@ -247,23 +247,14 @@ public class JSONParser implements Closeable {
                 break;
             default:
         }
-        loop:
         while (true) {
-            switch (curr) {
-                case ' ':
-                case '\n':
-                case '\t':
-                case '\r':
-                    curr = (char) reader.read();
-                    continue loop;
-                case Constant.EOF:
-                    curr = Constant.EOF;
-                    break loop;
-                default:
-                    break loop;
+            if (((1L << curr) & ((curr - 64) >> 31) & 0x100002600L) != 0L) {
+                curr = (char) reader.read();
+                continue;
+            } else {
+                return new BigDecimal(builder.toString());
             }
         }
-        return new BigDecimal(builder.toString());
     }
 
     private String parseString() throws IOException, JSONParserException {
@@ -325,24 +316,12 @@ public class JSONParser implements Closeable {
     }
 
     private char next() throws IOException {
-        loop:
         while (true) {
-            char c = (char) reader.read();
-            switch (c) {
-                case ' ':
-                case '\n':
-                case '\t':
-                case '\r':
-                    continue loop;
-                case Constant.EOF:
-                    curr = Constant.EOF;
-                    break loop;
-                default:
-                    curr = c;
-                    break loop;
+            curr = (char) reader.read();
+            if (((1L << curr) & ((curr - 64) >> 31) & 0x100002600L) == 0L) {
+                return curr;
             }
         }
-        return curr;
     }
 
     private char next0() throws IOException {
@@ -372,13 +351,6 @@ public class JSONParser implements Closeable {
             return true;
         } else {
             return false;
-        }
-    }
-
-    public static void main(String[] args) throws IOException, JSONParserException {
-        try (InputStream stream = new ByteArrayInputStream("[true   ,false  ,0.15e+3 ]".getBytes())) {
-            JSONParser parser = new JSONParser(stream, Charset.defaultCharset(), true);
-            System.out.println(parser.parse());
         }
     }
 
