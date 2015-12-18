@@ -32,8 +32,8 @@ public class BenchMark {
 
     public void test() throws IOException, JSONParserException {
         benchmark("canada.json", 1000);
-        benchmark("citm_catalog.json", 1000); //slower than jackson
-        benchmark("twitter.json", 1000); //slower than jackson
+        benchmark("citm_catalog.json", 2000); //slower than jackson
+        benchmark("twitter.json", 2000); //slower than jackson
     }
 
     private void benchmark(String fileName, int loopSize) throws IOException, JSONParserException {
