@@ -96,8 +96,32 @@ public class JSONParser implements Closeable {
 
     private Object parseValue() throws IOException, JSONParserException {
         switch (curr) {
+            case Constant.LBRACE:
+                next();
+                return parseObject();
+            case Constant.LBRACKET:
+                next();
+                return parseArray();
             case Constant.QUOTE:
                 return parseString();
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '-':
+                return parseNumber();
+            case 'n':
+                next0();
+                accept0('u');
+                accept0('l');
+                accept('l');
+                return null;
             case 't':
                 next0();
                 accept0('r');
@@ -111,30 +135,6 @@ public class JSONParser implements Closeable {
                 accept0('s');
                 accept('e');
                 return false;
-            case 'n':
-                next0();
-                accept0('u');
-                accept0('l');
-                accept('l');
-                return null;
-            case Constant.LBRACE:
-                next();
-                return parseObject();
-            case Constant.LBRACKET:
-                next();
-                return parseArray();
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-            case '-':
-                return parseNumber();
             default:
                 throw new JSONParserException("Expected '{','[','t','f','n','\"','-','0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
         }
