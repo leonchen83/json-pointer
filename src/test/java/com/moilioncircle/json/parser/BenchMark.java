@@ -5,8 +5,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.nio.charset.Charset;
 
 /**
  * Copyright leon
@@ -27,54 +25,30 @@ import java.nio.charset.Charset;
  */
 public class BenchMark {
     public static void main(String[] args) throws IOException, JSONParserException {
-        InputStream stream = BenchMark.class.getClassLoader().getResourceAsStream("canada.json");
+        benchmark("canada.json", 1000);
+        benchmark("citm_catalog.json",1000);
+        benchmark("twitter.json",1000);
+    }
+
+    private static void benchmark(String fileName, int loopSize) throws IOException, JSONParserException {
+        System.out.println(fileName);
+        InputStream stream = BenchMark.class.getClassLoader().getResourceAsStream(fileName);
         byte[] bytes = IOUtils.toByteArray(stream);
         IOUtils.closeQuietly(stream);
         String str = new String(bytes);
         ObjectMapper mapper = new ObjectMapper();
 
         long start = System.currentTimeMillis();
-        //47389
-//        for (int i = 0; i < 1000; i++) {
-//            try (StringReader reader = new StringReader(str)) {
-//                JSONParser parser = new JSONParser(reader, false);
-//                parser.parse();
-//            }
-//        }
-//        System.out.println(System.currentTimeMillis() - start);
-
-        //73612
-        for (int i = 0; i < 1000; i++) {
-            try (StringReader reader = new StringReader(str)) {
-                mapper.readTree(reader);
-            }
+        //47389,36582,44350
+        for (int i = 0; i < loopSize; i++) {
+            ParserFactory.readTree(str);
         }
-        System.out.println(System.currentTimeMillis() - start);
-    }
-
-    public void testCanada() throws Exception {
-        try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("canada.json")) {
-            parse(stream);
-        } catch (Exception e) {
+        System.out.println("JSON parser: " + (System.currentTimeMillis() - start) / (double) loopSize);
+        start = System.currentTimeMillis();
+        //73612,64926,68491
+        for (int i = 0; i < loopSize; i++) {
+            mapper.readTree(str);
         }
-    }
-
-    public void testCatalog() throws Exception {
-        try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("citm_catalog.json")) {
-            parse(stream);
-        } catch (Exception e) {
-        }
-    }
-
-    public void testTwitter() throws Exception {
-        try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("twitter.json")) {
-            parse(stream);
-        } catch (Exception e) {
-        }
-    }
-
-    private void parse(InputStream stream) throws IOException, JSONParserException {
-        JSONParser parser = new JSONParser(stream, Charset.defaultCharset(), true);
-        parser.parse();
+        System.out.println("Jackson parser: " + (System.currentTimeMillis() - start) / (double) loopSize);
     }
 }

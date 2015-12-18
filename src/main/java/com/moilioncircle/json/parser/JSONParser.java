@@ -21,8 +21,7 @@ import java.nio.charset.Charset;
  *
  * @author leon on 15-11-11
  */
-public class JSONParser {
-
+public class JSONParser implements Closeable {
     private char curr;
 
     private final StringBuilder builder = new StringBuilder();
@@ -293,7 +292,7 @@ public class JSONParser {
                             builder.append((char) s);
                             continue loop;
                         default:
-                            throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but "+(curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+                            throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
                     }
                 case Constant.EOF:
                 case '\n':
@@ -360,4 +359,10 @@ public class JSONParser {
 
     }
 
+    @Override
+    public void close() throws IOException {
+        if (reader != null) {
+            reader.close();
+        }
+    }
 }
