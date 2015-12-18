@@ -99,22 +99,22 @@ public class JSONParser implements Closeable {
             case Constant.QUOTE:
                 return parseString();
             case 't':
-                accept('t');
-                accept('r');
-                accept('u');
+                next0();
+                accept0('r');
+                accept0('u');
                 accept('e');
                 return true;
             case 'f':
-                accept('f');
-                accept('a');
-                accept('l');
-                accept('s');
+                next0();
+                accept0('a');
+                accept0('l');
+                accept0('s');
                 accept('e');
                 return false;
             case 'n':
-                accept('n');
-                accept('u');
-                accept('l');
+                next0();
+                accept0('u');
+                accept0('l');
                 accept('l');
                 return null;
             case Constant.LBRACE:
@@ -145,14 +145,14 @@ public class JSONParser implements Closeable {
         switch (curr) {
             case '-':
                 builder.append('-');
-                next();
+                next0();
                 break;
             default:
         }
         switch (curr) {
             case '0':
                 builder.append('0');
-                next();
+                next0();
                 break;
             case '1':
             case '2':
@@ -164,7 +164,7 @@ public class JSONParser implements Closeable {
             case '8':
             case '9':
                 builder.append(curr);
-                while (next() >= '0' && curr <= '9') {
+                while (next0() >= '0' && curr <= '9') {
                     builder.append(curr);
                 }
                 break;
@@ -174,7 +174,7 @@ public class JSONParser implements Closeable {
         switch (curr) {
             case '.':
                 builder.append('.');
-                next();
+                next0();
                 switch (curr) {
                     case '0':
                     case '1':
@@ -187,7 +187,7 @@ public class JSONParser implements Closeable {
                     case '8':
                     case '9':
                         builder.append(curr);
-                        while (next() >= '0' && curr <= '9') {
+                        while (next0() >= '0' && curr <= '9') {
                             builder.append(curr);
                         }
                         break;
@@ -202,12 +202,12 @@ public class JSONParser implements Closeable {
             case 'e':
             case 'E':
                 builder.append(curr);
-                next();
+                next0();
                 switch (curr) {
                     case '+':
                     case '-':
                         builder.append(curr);
-                        next();
+                        next0();
                         switch (curr) {
                             case '0':
                             case '1':
@@ -241,11 +241,27 @@ public class JSONParser implements Closeable {
                     default:
                         throw new JSONParserException("Expected '+','-','0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
                 }
-                while (next() >= '0' && curr <= '9') {
+                while (next0() >= '0' && curr <= '9') {
                     builder.append(curr);
                 }
                 break;
             default:
+        }
+        loop:
+        while (true) {
+            switch (curr) {
+                case ' ':
+                case '\n':
+                case '\t':
+                case '\r':
+                    curr = (char) reader.read();
+                    continue loop;
+                case Constant.EOF:
+                    curr = Constant.EOF;
+                    break loop;
+                default:
+                    break loop;
+            }
         }
         return new BigDecimal(builder.toString());
     }
@@ -342,6 +358,14 @@ public class JSONParser implements Closeable {
         }
     }
 
+    private void accept0(char c) throws IOException, JSONParserException {
+        if (c == curr) {
+            next0();
+        } else {
+            throw new JSONParserException("Expected '" + c + "' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+        }
+    }
+
     private boolean nextIfAccept(char c) throws IOException {
         if (c == curr) {
             next();
@@ -352,11 +376,10 @@ public class JSONParser implements Closeable {
     }
 
     public static void main(String[] args) throws IOException, JSONParserException {
-        try (InputStream stream = new ByteArrayInputStream("[\"  \"]".getBytes())) {
+        try (InputStream stream = new ByteArrayInputStream("[true   ,false  ,0.15e+3 ]".getBytes())) {
             JSONParser parser = new JSONParser(stream, Charset.defaultCharset(), true);
             System.out.println(parser.parse());
         }
-
     }
 
     @Override
