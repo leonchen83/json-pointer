@@ -32,9 +32,21 @@ public class BenchMark {
     }
 
     public void test() throws IOException, JSONParserException {
-        benchmark("canada.json", 1000);
-        benchmark("citm_catalog.json", 2000); //slower than jackson
-        benchmark("twitter.json", 2000); //slower than jackson
+        benchmark("canada.json", 1000); //faster than jackson
+        benchmark("citm_catalog.json", 4000); //slower than jackson
+        benchmark("twitter.json", 4000); //slower than jackson
+        System.out.println("-----------------------------------------------------");
+        benchmark0("canada.json", 1000); //faster than jackson
+        benchmark0("citm_catalog.json", 4000); //faster than jackson
+        benchmark0("twitter.json", 4000); //slower than jackson
+        System.out.println("-----------------------------------------------------");
+        benchmark1("canada.json", 1000); //faster than jackson
+        benchmark1("citm_catalog.json", 4000); //slower than jackson
+        benchmark1("twitter.json", 4000); //slower than jackson
+        System.out.println("-----------------------------------------------------");
+        benchmark2("canada.json", 1000); //faster than jackson
+        benchmark2("citm_catalog.json", 4000); //slower than jackson
+        benchmark2("twitter.json", 4000); //slower than jackson
     }
 
     //reader
@@ -66,7 +78,7 @@ public class BenchMark {
         for (int i = 0; i < loopSize; i++) {
             ParserFactory.readTree(streams[i]);
         }
-        System.out.println("JSON parser: " + (System.currentTimeMillis() - start) / (double) loopSize);
+        System.out.println("MY JSON parser: " + (System.currentTimeMillis() - start) / (double) loopSize);
     }
 
     //str
@@ -91,7 +103,7 @@ public class BenchMark {
         for (int i = 0; i < loopSize; i++) {
             ParserFactory.readTree(str);
         }
-        System.out.println("JSON parser: " + (System.currentTimeMillis() - start) / (double) loopSize);
+        System.out.println("MY JSON parser: " + (System.currentTimeMillis() - start) / (double) loopSize);
     }
 
     //inputstream
@@ -123,7 +135,7 @@ public class BenchMark {
         for (int i = 0; i < loopSize; i++) {
             ParserFactory.readTree(streams[i]);
         }
-        System.out.println("JSON parser: " + (System.currentTimeMillis() - start) / (double) loopSize);
+        System.out.println("MY JSON parser: " + (System.currentTimeMillis() - start) / (double) loopSize);
     }
 
     //bytes
@@ -148,6 +160,7 @@ public class BenchMark {
         for (int i = 0; i < loopSize; i++) {
             ParserFactory.readTree(bytes);
         }
-        System.out.println("JSON parser: " + (System.currentTimeMillis() - start) / (double) loopSize);
+        System.out.println("MY JSON parser: " + (System.currentTimeMillis() - start) / (double) loopSize);
     }
+
 }

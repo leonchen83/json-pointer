@@ -1,5 +1,7 @@
 package com.moilioncircle.json.parser;
 
+import com.moilioncircle.json.parser.input.*;
+
 import java.io.*;
 import java.nio.charset.Charset;
 
@@ -26,16 +28,16 @@ public class ParserFactory {
     }
 
     private static class ParserBuilder {
-        private Reader reader;
+        private ParserInput input;
         private boolean isOrdered;
 
         public ParserBuilder reader(Reader reader) {
-            this.reader = reader;
+            this.input = new ReaderParserInput(reader);
             return this;
         }
 
         public ParserBuilder stream(InputStream stream, Charset charset) {
-            this.reader = new InputStreamReader(stream, charset);
+            this.input = new InputStreamParserInput(stream,charset);
             return this;
         }
 
@@ -44,7 +46,8 @@ public class ParserFactory {
         }
 
         public ParserBuilder bytes(byte[] bytes, Charset charset) {
-            return stream(new ByteArrayInputStream(bytes), charset);
+            this.input = new ByteArrayParserInput(bytes,charset);
+            return this;
         }
 
         public ParserBuilder bytes(byte[] bytes) {
@@ -52,7 +55,13 @@ public class ParserFactory {
         }
 
         public ParserBuilder string(String jsonStr) {
-            return reader(new StringReader(jsonStr));
+            this.input = new StringParserInput(jsonStr);
+            return this;
+        }
+
+        public ParserBuilder chars(char[] chars) {
+            this.input = new CharArrayParserInput(chars);
+            return this;
         }
 
         public ParserBuilder order(boolean isOrdered) {
@@ -61,7 +70,7 @@ public class ParserFactory {
         }
 
         public JSONParser build() {
-            return new JSONParser(reader, isOrdered);
+            return new JSONParser(input, isOrdered);
         }
     }
 
@@ -73,6 +82,12 @@ public class ParserFactory {
 
     public static JSONType readTree(Reader reader) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().reader(reader).build()) {
+            return parser.parse();
+        }
+    }
+
+    public static JSONType readTree(char[] chars) throws IOException, JSONParserException {
+        try (JSONParser parser = new ParserBuilder().chars(chars).build()) {
             return parser.parse();
         }
     }
@@ -109,6 +124,12 @@ public class ParserFactory {
 
     public static JSONType readTree(Reader reader, boolean isOrdered) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().reader(reader).order(isOrdered).build()) {
+            return parser.parse();
+        }
+    }
+
+    public static JSONType readTree(char[] chars, boolean isOrdered) throws IOException, JSONParserException {
+        try (JSONParser parser = new ParserBuilder().chars(chars).order(isOrdered).build()) {
             return parser.parse();
         }
     }

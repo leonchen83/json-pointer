@@ -1,6 +1,8 @@
 package com.moilioncircle.json.parser;
 
+import com.moilioncircle.json.parser.input.StringParserInput;
 import junit.framework.TestCase;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -571,7 +573,10 @@ public class JSONParserTest extends TestCase {
     }
 
     private void parse(InputStream stream) throws IOException, JSONParserException {
-        JSONParser parser = new JSONParser(stream, Charset.defaultCharset(), true);
+        byte[] bytes = IOUtils.toByteArray(stream);
+        IOUtils.closeQuietly(stream);
+        String str = new String(bytes);
+        JSONParser parser = new JSONParser(new StringParserInput(str), true);
         parser.parse();
     }
 }

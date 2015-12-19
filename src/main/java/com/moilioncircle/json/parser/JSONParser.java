@@ -1,8 +1,10 @@
 package com.moilioncircle.json.parser;
 
-import java.io.*;
+import com.moilioncircle.json.parser.input.ParserInput;
+
+import java.io.Closeable;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 
 /**
  * Copyright leon
@@ -24,18 +26,15 @@ import java.nio.charset.Charset;
 public class JSONParser implements Closeable {
     private char curr;
 
-    private final StringBuilder builder = new StringBuilder();
+    private final StringBuilder builder = new StringBuilder(40);
 
     private final boolean isOrdered;
 
-    private final BufferedReader reader;
+    //??
+    private final ParserInput input;
 
-    public JSONParser(InputStream stream, Charset encoding, boolean isOrdered) {
-        this(new InputStreamReader(stream, encoding), isOrdered);
-    }
-
-    public JSONParser(Reader reader, boolean isOrdered) {
-        this.reader = new BufferedReader(reader);
+    public JSONParser(ParserInput input, boolean isOrdered) {
+        this.input = input;
         this.isOrdered = isOrdered;
     }
 
@@ -61,17 +60,16 @@ public class JSONParser implements Closeable {
     public JSONObject parseObject() throws IOException, JSONParserException {
         JSONObject object = new JSONObject(isOrdered);
         switch (curr) {
-            case Constant.RBRACE:
-                next();
-                return object;
             case Constant.QUOTE:
                 do {
                     String key = parseString();
                     accept(Constant.COLON);
-                    Object value = parseValue();
-                    object.put(key, value);
+                    object.put(key, parseValue());
                 } while (nextIfAccept(Constant.COMMA));
                 accept(Constant.RBRACE);
+                return object;
+            case Constant.RBRACE:
+                next();
                 return object;
             default:
                 throw new JSONParserException("Expected '}','\"' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
@@ -86,8 +84,7 @@ public class JSONParser implements Closeable {
                 return array;
             default:
                 do {
-                    Object value = parseValue();
-                    array.add(value);
+                    array.add(parseValue());
                 } while (nextIfAccept(Constant.COMMA));
                 accept(Constant.RBRACKET);
                 return array;
@@ -249,7 +246,7 @@ public class JSONParser implements Closeable {
         }
         while (true) {
             if (((1L << curr) & ((curr - 64) >> 31) & 0x100002600L) != 0L) {
-                curr = (char) reader.read();
+                curr = input.read();
                 continue;
             } else {
                 return new BigDecimal(builder.toString());
@@ -262,7 +259,13 @@ public class JSONParser implements Closeable {
         loop:
         while (true) {
             next0();
+            if (((1L << curr) & ((31 - curr) >> 31) & 0x7ffffffbefffffffL) != 0L) {
+                builder.append(curr);
+                continue loop;
+            }
             switch (curr) {
+                //bloom filter?
+                //low cache hint
                 case Constant.QUOTE:
                     next();
                     return builder.toString();
@@ -295,7 +298,7 @@ public class JSONParser implements Closeable {
                             builder.append('/');
                             continue loop;
                         case 'u':
-                            int s = Integer.valueOf(new String(new char[]{next0(), next0(), next0(), next0()}), 16);
+                            int s = Integer.parseInt(new String(new char[]{next0(), next0(), next0(), next0()}), 16);
                             builder.append((char) s);
                             continue loop;
                         default:
@@ -308,16 +311,16 @@ public class JSONParser implements Closeable {
                 case '\f':
                 case '\b':
                     throw new JSONParserException("Un-closed String");
-                default:
-                    builder.append(curr);
-                    continue loop;
+//                default:
+//                    builder.append(curr);
+//                    continue loop;
             }
         }
     }
 
     private char next() throws IOException {
         while (true) {
-            curr = (char) reader.read();
+            curr = input.read();
             if (((1L << curr) & ((curr - 64) >> 31) & 0x100002600L) == 0L) {
                 return curr;
             }
@@ -325,8 +328,7 @@ public class JSONParser implements Closeable {
     }
 
     private char next0() throws IOException {
-        curr = (char) reader.read();
-        return curr;
+        return curr = input.read();
     }
 
     private void accept(char c) throws IOException, JSONParserException {
@@ -356,8 +358,8 @@ public class JSONParser implements Closeable {
 
     @Override
     public void close() throws IOException {
-        if (reader != null) {
-            reader.close();
+        if (input != null) {
+            input.close();
         }
     }
 }
