@@ -1,6 +1,7 @@
 package com.moilioncircle.json.parser.input;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * Copyright leon
@@ -20,5 +21,5 @@ import java.io.Closeable;
  * @author leon on 15-12-19
  */
 public interface ParserInput extends Closeable{
-    public char read();
+    public char read() throws IOException;
 }

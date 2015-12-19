@@ -30,7 +30,6 @@ public class JSONParser implements Closeable {
 
     private final boolean isOrdered;
 
-    //??
     private final ParserInput input;
 
     public JSONParser(ParserInput input, boolean isOrdered) {
@@ -171,8 +170,7 @@ public class JSONParser implements Closeable {
         switch (curr) {
             case '.':
                 builder.append('.');
-                next0();
-                switch (curr) {
+                switch (next0()) {
                     case '0':
                     case '1':
                     case '2':
@@ -199,13 +197,11 @@ public class JSONParser implements Closeable {
             case 'e':
             case 'E':
                 builder.append(curr);
-                next0();
-                switch (curr) {
+                switch (next0()) {
                     case '+':
                     case '-':
                         builder.append(curr);
-                        next0();
-                        switch (curr) {
+                        switch (next0()) {
                             case '0':
                             case '1':
                             case '2':
@@ -246,7 +242,7 @@ public class JSONParser implements Closeable {
         }
         while (true) {
             if (((1L << curr) & ((curr - 64) >> 31) & 0x100002600L) != 0L) {
-                curr = input.read();
+                next0();
                 continue;
             } else {
                 return new BigDecimal(builder.toString());
@@ -258,41 +254,28 @@ public class JSONParser implements Closeable {
         builder.setLength(0);
         loop:
         while (true) {
-            next0();
-            if (((1L << curr) & ((31 - curr) >> 31) & 0x7ffffffbefffffffL) != 0L) {
-                builder.append(curr);
-                continue loop;
-            }
-            switch (curr) {
+            switch (next0()) {
                 //bloom filter?
                 //low cache hint
                 case Constant.QUOTE:
                     next();
                     return builder.toString();
                 case '\\':
-                    next0();
-                    switch (curr) {
+                    switch (next0()) {
                         case Constant.QUOTE:
                             builder.append('\"');
                             continue loop;
                         case '\\':
                             builder.append('\\');
                             continue loop;
-                        case 'b':
-                            builder.append('\b');
-                            continue loop;
-                        case 'f':
-                        case 'F':
-                            builder.append('\f');
-                            continue loop;
                         case 'n':
                             builder.append('\n');
                             continue loop;
-                        case 'r':
-                            builder.append('\r');
-                            continue loop;
                         case 't':
                             builder.append('\t');
+                            continue loop;
+                        case 'r':
+                            builder.append('\r');
                             continue loop;
                         case '/':
                             builder.append('/');
@@ -300,6 +283,13 @@ public class JSONParser implements Closeable {
                         case 'u':
                             int s = Integer.parseInt(new String(new char[]{next0(), next0(), next0(), next0()}), 16);
                             builder.append((char) s);
+                            continue loop;
+                        case 'b':
+                            builder.append('\b');
+                            continue loop;
+                        case 'f':
+                        case 'F':
+                            builder.append('\f');
                             continue loop;
                         default:
                             throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
@@ -311,16 +301,16 @@ public class JSONParser implements Closeable {
                 case '\f':
                 case '\b':
                     throw new JSONParserException("Un-closed String");
-//                default:
-//                    builder.append(curr);
-//                    continue loop;
+                default:
+                    builder.append(curr);
+                    continue loop;
             }
         }
     }
 
     private char next() throws IOException {
         while (true) {
-            curr = input.read();
+            next0();
             if (((1L << curr) & ((curr - 64) >> 31) & 0x100002600L) == 0L) {
                 return curr;
             }
@@ -351,9 +341,8 @@ public class JSONParser implements Closeable {
         if (c == curr) {
             next();
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

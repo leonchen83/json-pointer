@@ -1,5 +1,6 @@
 package com.moilioncircle.json.parser.input;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -22,20 +23,19 @@ import java.nio.charset.Charset;
  */
 public class ByteArrayParserInput implements ParserInput {
 
-    private final byte[] bytes;
-    private final Charset charset;
+    private final ParserInput input;
 
-    public ByteArrayParserInput(byte[] bytes,Charset charset){
-        this.bytes = bytes;
-        this.charset = charset;
+    public ByteArrayParserInput(byte[] bytes, Charset charset) throws IOException {
+        this.input = new InputStreamParserInput(new ByteArrayInputStream(bytes), charset);
     }
+
     @Override
-    public char read() {
-        return 0;
+    public char read() throws IOException {
+        return input.read();
     }
 
     @Override
     public void close() throws IOException {
-
+        input.close();
     }
 }

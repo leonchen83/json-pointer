@@ -1,5 +1,7 @@
 package com.moilioncircle.json.parser.input;
 
+import com.moilioncircle.json.parser.Constant;
+
 import java.io.IOException;
 import java.io.Reader;
 
@@ -22,19 +24,35 @@ import java.io.Reader;
  */
 public class ReaderParserInput implements ParserInput {
     private final Reader reader;
+    private final char[] cbuf;
+    private int clen;
+    private int index;
+    public static final int BUF_SIZE = 8192;
 
-    public ReaderParserInput(Reader reader) {
+    public ReaderParserInput(Reader reader) throws IOException {
         this.reader = reader;
+        cbuf = new char[BUF_SIZE];
+        clen = reader.read(cbuf);
     }
 
     @Override
-    public char read() {
-        return 0;
+    public char read() throws IOException {
+        if (clen != -1) {
+            if (index < clen) {
+                return cbuf[index++];
+            } else {
+                index = 0;
+                clen = reader.read(cbuf);
+                return read();
+            }
+        } else {
+            return Constant.EOF;
+        }
     }
 
     @Override
     public void close() throws IOException {
-        if(reader!=null){
+        if (reader != null) {
             reader.close();
         }
     }

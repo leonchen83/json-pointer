@@ -2,7 +2,9 @@ package com.moilioncircle.json.parser;
 
 import com.moilioncircle.json.parser.input.*;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.nio.charset.Charset;
 
 /**
@@ -31,27 +33,27 @@ public class ParserFactory {
         private ParserInput input;
         private boolean isOrdered;
 
-        public ParserBuilder reader(Reader reader) {
+        public ParserBuilder reader(Reader reader) throws IOException {
             this.input = new ReaderParserInput(reader);
             return this;
         }
 
-        public ParserBuilder stream(InputStream stream, Charset charset) {
-            this.input = new InputStreamParserInput(stream,charset);
+        public ParserBuilder stream(InputStream stream, Charset charset) throws IOException {
+            this.input = new InputStreamParserInput(stream, charset);
             return this;
         }
 
-        public ParserBuilder stream(InputStream stream) {
+        public ParserBuilder stream(InputStream stream) throws IOException {
             return stream(stream, Charset.defaultCharset());
         }
 
-        public ParserBuilder bytes(byte[] bytes, Charset charset) {
-            this.input = new ByteArrayParserInput(bytes,charset);
+        public ParserBuilder bytes(byte[] bytes, Charset charset) throws IOException {
+            this.input = new ByteArrayParserInput(bytes, charset);
             return this;
         }
 
-        public ParserBuilder bytes(byte[] bytes) {
-            return stream(new ByteArrayInputStream(bytes));
+        public ParserBuilder bytes(byte[] bytes) throws IOException {
+            return bytes(bytes, Charset.defaultCharset());
         }
 
         public ParserBuilder string(String jsonStr) {

@@ -2,6 +2,7 @@ package com.moilioncircle.json.parser.input;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 /**
@@ -23,23 +24,19 @@ import java.nio.charset.Charset;
  */
 public class InputStreamParserInput implements ParserInput {
 
-    private final InputStream stream;
-    private final Charset charset;
+    private final ReaderParserInput input;
 
-    public InputStreamParserInput(InputStream stream, Charset charset) {
-        this.stream = stream;
-        this.charset = charset;
+    public InputStreamParserInput(InputStream stream, Charset charset) throws IOException {
+        this.input = new ReaderParserInput(new InputStreamReader(stream, charset));
     }
 
     @Override
-    public char read() {
-        return 0;
+    public char read() throws IOException {
+        return input.read();
     }
 
     @Override
     public void close() throws IOException {
-        if (stream != null) {
-            stream.close();
-        }
+        input.close();
     }
 }
