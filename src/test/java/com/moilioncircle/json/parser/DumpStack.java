@@ -24,13 +24,10 @@ import java.io.InputStream;
  */
 public class DumpStack {
     public static void main(String[] args) throws IOException, JSONParserException, InterruptedException {
-        InputStream stream = BenchMark1.class.getClassLoader().getResourceAsStream("twitter.json");
+        InputStream stream = BenchMark.class.getClassLoader().getResourceAsStream("twitter.json");
         byte[] bytes = IOUtils.toByteArray(stream);
         IOUtils.closeQuietly(stream);
         String str = new String(bytes);
-//        for (int i = 0; i < 10; i++) {
-            ParserFactory.readTree(str);
-//        }
-
+        ParserFactory.readTree(str);
     }
 }
