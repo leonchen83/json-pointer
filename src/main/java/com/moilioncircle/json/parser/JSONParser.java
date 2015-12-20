@@ -243,20 +243,23 @@ public class JSONParser implements Closeable {
                 break;
             default:
         }
-        for(;;) {
-            if (((1L << curr) & ((curr - 64) >> 31) & 0x100002600L) != 0L) {
-                next0();
-                continue;
-            } else {
-                return new BigDecimal(builder.toString());
+        for (; ; ) {
+            switch (curr) {
+                case ' ':
+                case '\n':
+                case '\t':
+                case '\r':
+                    next0();
+                    continue;
+                default:
+                    return new BigDecimal(builder.toString());
             }
         }
     }
 
     private String parseString() throws JSONParserException, IOException {
         builder.setLength(0);
-        loop:
-        for(;;) {
+        for (; ; ) {
             switch (next0()) {
                 case Constant.QUOTE:
                     next();
@@ -265,33 +268,33 @@ public class JSONParser implements Closeable {
                     switch (next0()) {
                         case Constant.QUOTE:
                             builder.append('\"');
-                            continue loop;
+                            continue;
                         case '\\':
                             builder.append('\\');
-                            continue loop;
+                            continue;
                         case 'n':
                             builder.append('\n');
-                            continue loop;
+                            continue;
                         case 't':
                             builder.append('\t');
-                            continue loop;
+                            continue;
                         case 'r':
                             builder.append('\r');
-                            continue loop;
+                            continue;
                         case '/':
                             builder.append('/');
-                            continue loop;
+                            continue;
                         case 'u':
                             int s = Integer.parseInt(new String(new char[]{next0(), next0(), next0(), next0()}), 16);
                             builder.append((char) s);
-                            continue loop;
+                            continue;
                         case 'b':
                             builder.append('\b');
-                            continue loop;
+                            continue;
                         case 'f':
                         case 'F':
                             builder.append('\f');
-                            continue loop;
+                            continue;
                         default:
                             throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
                     }
@@ -304,16 +307,21 @@ public class JSONParser implements Closeable {
                     throw new JSONParserException("Un-closed String");
                 default:
                     builder.append(curr);
-                    continue loop;
+                    continue;
             }
         }
     }
 
     private char next() throws IOException {
-         for(;;) {
-            next0();
-            if (((1L << curr) & ((curr - 64) >> 31) & 0x100002600L) == 0L) {
-                return curr;
+        for (; ; ) {
+            switch (next0()) {
+                case ' ':
+                case '\n':
+                case '\t':
+                case '\r':
+                    continue;
+                default:
+                    return curr;
             }
         }
     }
@@ -337,7 +345,7 @@ public class JSONParser implements Closeable {
             throw new JSONParserException("Expected '" + c + "' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
         }
     }
-    
+
     private boolean nextIfAccept(char c) throws IOException {
         if (c == curr) {
             next();

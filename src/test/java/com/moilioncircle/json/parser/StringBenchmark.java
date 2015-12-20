@@ -32,6 +32,11 @@ public class StringBenchmark {
     public static String twitter;
     public static String citm_catalog;
     public static String canada;
+    public static String twitter_trim;
+    public static String pass1;
+    public static String pass2;
+    public static String pass3;
+    public static String pass3_trim;
 
     public static final ObjectMapper mapper = new ObjectMapper();
 
@@ -51,9 +56,44 @@ public class StringBenchmark {
             bytes = IOUtils.toByteArray(stream);
             IOUtils.closeQuietly(stream);
             canada = new String(bytes);
+
+            stream = StringBenchmark.class.getClassLoader().getResourceAsStream("twitter_trim.json");
+            bytes = IOUtils.toByteArray(stream);
+            IOUtils.closeQuietly(stream);
+            twitter_trim = new String(bytes);
+
+            stream = StringBenchmark.class.getClassLoader().getResourceAsStream("pass1.json");
+            bytes = IOUtils.toByteArray(stream);
+            IOUtils.closeQuietly(stream);
+            pass1 = new String(bytes);
+
+            stream = StringBenchmark.class.getClassLoader().getResourceAsStream("pass2.json");
+            bytes = IOUtils.toByteArray(stream);
+            IOUtils.closeQuietly(stream);
+            pass2 = new String(bytes);
+
+            stream = StringBenchmark.class.getClassLoader().getResourceAsStream("pass3.json");
+            bytes = IOUtils.toByteArray(stream);
+            IOUtils.closeQuietly(stream);
+            pass3 = new String(bytes);
+
+            stream = StringBenchmark.class.getClassLoader().getResourceAsStream("pass3_trim.json");
+            bytes = IOUtils.toByteArray(stream);
+            IOUtils.closeQuietly(stream);
+            pass3_trim = new String(bytes);
         } catch (Exception e) {
 
         }
+    }
+
+    @Benchmark
+    public void testTwitterTrimMyJSONParser() throws IOException, JSONParserException {
+        ParserFactory.readTree(twitter_trim);
+    }
+
+    @Benchmark
+    public void testTwitterTrimJacksonParser() throws IOException, JSONParserException {
+        mapper.readTree(twitter_trim);
     }
 
     @Benchmark
@@ -86,11 +126,51 @@ public class StringBenchmark {
         mapper.readTree(citm_catalog);
     }
 
+    @Benchmark
+    public void testPass1MyJSONParser() throws IOException, JSONParserException {
+        ParserFactory.readTree(pass1);
+    }
+
+    @Benchmark
+    public void testPass1JacksonParser() throws IOException, JSONParserException {
+        mapper.readTree(pass1);
+    }
+
+    @Benchmark
+    public void testPass3MyJSONParser() throws IOException, JSONParserException {
+        ParserFactory.readTree(pass3);
+    }
+
+    @Benchmark
+    public void testPass3JacksonParser() throws IOException, JSONParserException {
+        mapper.readTree(pass3);
+    }
+
+    @Benchmark
+    public void testPass2MyJSONParser() throws IOException, JSONParserException {
+        ParserFactory.readTree(pass2);
+    }
+
+    @Benchmark
+    public void testPass2JacksonParser() throws IOException, JSONParserException {
+        mapper.readTree(pass2);
+    }
+
+    @Benchmark
+    public void testPass3TrimMyJSONParser() throws IOException, JSONParserException {
+        ParserFactory.readTree(pass3_trim);
+    }
+
+    @Benchmark
+    public void testPass3TrimJacksonParser() throws IOException, JSONParserException {
+        mapper.readTree(pass3_trim);
+    }
+
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(StringBenchmark.class.getSimpleName())
-                .warmupIterations(30)
-                .measurementIterations(30)
+                .warmupIterations(20)
+                .measurementIterations(20)
                 .forks(1)
                 .build();
 
