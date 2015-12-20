@@ -6,6 +6,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+import static com.moilioncircle.json.parser.Constant.*;
+
 /**
  * Copyright leon
  * <p/>
@@ -24,6 +26,7 @@ import java.math.BigDecimal;
  * @author leon on 15-11-11
  */
 public class JSONParser implements Closeable {
+
     private char curr;
 
     private final StringBuilder builder = new StringBuilder(40);
@@ -41,64 +44,64 @@ public class JSONParser implements Closeable {
         JSONType object;
         curr = next();
         switch (curr) {
-            case Constant.LBRACE:
+            case LBRACE:
                 next();
                 object = parseObject();
                 break;
-            case Constant.LBRACKET:
+            case LBRACKET:
                 next();
                 object = parseArray();
                 break;
             default:
-                throw new JSONParserException("Expected '{','[' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+                throw new JSONParserException("Expected '{','[' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
         }
-        accept(Constant.EOF);
+        accept(EOF);
         return object;
     }
 
-    public JSONObject parseObject() throws IOException, JSONParserException {
+    private JSONObject parseObject() throws IOException, JSONParserException {
         JSONObject object = new JSONObject(isOrdered);
         switch (curr) {
-            case Constant.QUOTE:
+            case QUOTE:
                 do {
                     String key = parseString();
-                    accept(Constant.COLON);
+                    accept(COLON);
                     object.put(key, parseValue());
-                } while (nextIfAccept(Constant.COMMA));
-                accept(Constant.RBRACE);
+                } while (nextIfAccept(COMMA));
+                accept(RBRACE);
                 return object;
-            case Constant.RBRACE:
+            case RBRACE:
                 next();
                 return object;
             default:
-                throw new JSONParserException("Expected '}','\"' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+                throw new JSONParserException("Expected '}','\"' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
         }
     }
 
-    public JSONArray parseArray() throws IOException, JSONParserException {
+    private JSONArray parseArray() throws IOException, JSONParserException {
         JSONArray array = new JSONArray();
         switch (curr) {
-            case Constant.RBRACKET:
+            case RBRACKET:
                 next();
                 return array;
             default:
                 do {
                     array.add(parseValue());
-                } while (nextIfAccept(Constant.COMMA));
-                accept(Constant.RBRACKET);
+                } while (nextIfAccept(COMMA));
+                accept(RBRACKET);
                 return array;
         }
     }
 
     private Object parseValue() throws IOException, JSONParserException {
         switch (curr) {
-            case Constant.LBRACE:
+            case LBRACE:
                 next();
                 return parseObject();
-            case Constant.LBRACKET:
+            case LBRACKET:
                 next();
                 return parseArray();
-            case Constant.QUOTE:
+            case QUOTE:
                 return parseString();
             case '0':
             case '1':
@@ -132,7 +135,7 @@ public class JSONParser implements Closeable {
                 accept('e');
                 return false;
             default:
-                throw new JSONParserException("Expected '{','[','t','f','n','\"','-','0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+                throw new JSONParserException("Expected '{','[','t','f','n','\"','-','0'~'9' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
         }
     }
 
@@ -165,7 +168,7 @@ public class JSONParser implements Closeable {
                 }
                 break;
             default:
-                throw new JSONParserException("Expected '0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+                throw new JSONParserException("Expected '0'~'9' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
         }
         switch (curr) {
             case '.':
@@ -187,7 +190,7 @@ public class JSONParser implements Closeable {
                         }
                         break;
                     default:
-                        throw new JSONParserException("Expected '0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+                        throw new JSONParserException("Expected '0'~'9' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
 
                 }
                 break;
@@ -215,7 +218,7 @@ public class JSONParser implements Closeable {
                                 builder.append(curr);
                                 break;
                             default:
-                                throw new JSONParserException("Expected '0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+                                throw new JSONParserException("Expected '0'~'9' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
 
                         }
                         break;
@@ -232,7 +235,7 @@ public class JSONParser implements Closeable {
                         builder.append(curr);
                         break;
                     default:
-                        throw new JSONParserException("Expected '+','-','0'~'9' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+                        throw new JSONParserException("Expected '+','-','0'~'9' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
                 }
                 while (next0() >= '0' && curr <= '9') {
                     builder.append(curr);
@@ -254,15 +257,18 @@ public class JSONParser implements Closeable {
         builder.setLength(0);
         loop:
         while (true) {
-            switch (next0()) {
+            switch (ARY[next0()]) {
                 //bloom filter?
                 //low cache hint
-                case Constant.QUOTE:
+                case 0:
+                    builder.append(curr);
+                    continue loop;
+                case 1:
                     next();
                     return builder.toString();
-                case '\\':
+                case 2:
                     switch (next0()) {
-                        case Constant.QUOTE:
+                        case QUOTE:
                             builder.append('\"');
                             continue loop;
                         case '\\':
@@ -292,18 +298,16 @@ public class JSONParser implements Closeable {
                             builder.append('\f');
                             continue loop;
                         default:
-                            throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+                            throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
                     }
-                case Constant.EOF:
-                case '\n':
-                case '\t':
-                case '\r':
-                case '\f':
-                case '\b':
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
                     throw new JSONParserException("Un-closed String");
-                default:
-                    builder.append(curr);
-                    continue loop;
+
             }
         }
     }
@@ -325,7 +329,7 @@ public class JSONParser implements Closeable {
         if (c == curr) {
             next();
         } else {
-            throw new JSONParserException("Expected '" + c + "' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+            throw new JSONParserException("Expected '" + c + "' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
         }
     }
 
@@ -333,10 +337,10 @@ public class JSONParser implements Closeable {
         if (c == curr) {
             next0();
         } else {
-            throw new JSONParserException("Expected '" + c + "' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+            throw new JSONParserException("Expected '" + c + "' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
         }
     }
-
+    
     private boolean nextIfAccept(char c) throws IOException {
         if (c == curr) {
             next();
