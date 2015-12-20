@@ -26,7 +26,7 @@ public class JSONArray implements JSONType, Collection<Object> {
     private final List<Object> list;
 
     public JSONArray() {
-        this.list = new ArrayList<>(40);
+        this.list = new ArrayList<>();
     }
 
     @Override

@@ -23,7 +23,7 @@ public class JSONObject implements JSONType,Map<String,Object> {
     private final Map<String, Object> map;
 
     public JSONObject(boolean isOrdered) {
-        this.map = isOrdered ? new LinkedHashMap<>() : new HashMap<>(128);
+        this.map = isOrdered ? new LinkedHashMap<>() : new HashMap<>();
     }
 
     public JSONObject() {

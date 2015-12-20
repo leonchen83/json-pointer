@@ -34,17 +34,4 @@ public class Constant {
     public static final char QUOTE = '"';
 
     public static final char EOF = '\uFFFF';
-
-    public static final int[] ARY = new int[65536];
-
-    static {
-        ARY[34] = 1;
-        ARY[92] = 2;
-        ARY[65535] = 3;
-        ARY[10] = 4;
-        ARY[9] = 5;
-        ARY[13] = 6;
-        ARY[12] = 7;
-        ARY[8] = 8;
-    }
 }

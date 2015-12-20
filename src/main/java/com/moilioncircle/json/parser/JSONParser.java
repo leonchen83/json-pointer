@@ -29,7 +29,7 @@ public class JSONParser implements Closeable {
 
     private char curr;
 
-    private final StringBuilder builder = new StringBuilder(40);
+    private final StringBuilder builder = new StringBuilder();
 
     private final boolean isOrdered;
 
@@ -243,7 +243,7 @@ public class JSONParser implements Closeable {
                 break;
             default:
         }
-        while (true) {
+        for(;;) {
             if (((1L << curr) & ((curr - 64) >> 31) & 0x100002600L) != 0L) {
                 next0();
                 continue;
@@ -253,22 +253,17 @@ public class JSONParser implements Closeable {
         }
     }
 
-    private String parseString() throws IOException, JSONParserException {
+    private String parseString() throws JSONParserException, IOException {
         builder.setLength(0);
         loop:
-        while (true) {
-            switch (ARY[next0()]) {
-                //bloom filter?
-                //low cache hint
-                case 0:
-                    builder.append(curr);
-                    continue loop;
-                case 1:
+        for(;;) {
+            switch (next0()) {
+                case Constant.QUOTE:
                     next();
                     return builder.toString();
-                case 2:
+                case '\\':
                     switch (next0()) {
-                        case QUOTE:
+                        case Constant.QUOTE:
                             builder.append('\"');
                             continue loop;
                         case '\\':
@@ -298,22 +293,24 @@ public class JSONParser implements Closeable {
                             builder.append('\f');
                             continue loop;
                         default:
-                            throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
+                            throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
                     }
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
+                case Constant.EOF:
+                case '\n':
+                case '\t':
+                case '\r':
+                case '\f':
+                case '\b':
                     throw new JSONParserException("Un-closed String");
-
+                default:
+                    builder.append(curr);
+                    continue loop;
             }
         }
     }
 
     private char next() throws IOException {
-        while (true) {
+         for(;;) {
             next0();
             if (((1L << curr) & ((curr - 64) >> 31) & 0x100002600L) == 0L) {
                 return curr;

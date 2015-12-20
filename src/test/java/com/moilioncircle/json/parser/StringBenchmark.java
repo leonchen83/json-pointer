@@ -78,17 +78,19 @@ public class StringBenchmark {
 
     @Benchmark
     public void testCitmCatalogMyJSONParser() throws IOException, JSONParserException {
-        ParserFactory.readTree(canada);
+        ParserFactory.readTree(citm_catalog);
     }
 
     @Benchmark
     public void testCitmCatalogJacksonParser() throws IOException, JSONParserException {
-        mapper.readTree(canada);
+        mapper.readTree(citm_catalog);
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(StringBenchmark.class.getSimpleName())
+                .warmupIterations(30)
+                .measurementIterations(30)
                 .forks(1)
                 .build();
 
