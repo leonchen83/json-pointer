@@ -29,11 +29,15 @@ public class JSONParser implements Closeable {
 
     private char curr;
 
-    private final StringBuilder builder = new StringBuilder();
-
     private final boolean isOrdered;
 
     private final ParserInput input;
+
+    private static final int CHAR_BUF_SIZE = 64;
+
+    private char[] cbuf = new char[CHAR_BUF_SIZE];
+
+    private int index;
 
     public JSONParser(ParserInput input, boolean isOrdered) {
         this.input = input;
@@ -140,17 +144,17 @@ public class JSONParser implements Closeable {
     }
 
     private Object parseNumber() throws IOException, JSONParserException {
-        builder.setLength(0);
+        index = 0;
         switch (curr) {
             case '-':
-                builder.append('-');
+                append('-');
                 next0();
                 break;
             default:
         }
         switch (curr) {
             case '0':
-                builder.append('0');
+                append('0');
                 next0();
                 break;
             case '1':
@@ -162,9 +166,9 @@ public class JSONParser implements Closeable {
             case '7':
             case '8':
             case '9':
-                builder.append(curr);
+                append(curr);
                 while (next0() >= '0' && curr <= '9') {
-                    builder.append(curr);
+                    append(curr);
                 }
                 break;
             default:
@@ -172,7 +176,7 @@ public class JSONParser implements Closeable {
         }
         switch (curr) {
             case '.':
-                builder.append('.');
+                append('.');
                 switch (next0()) {
                     case '0':
                     case '1':
@@ -184,9 +188,9 @@ public class JSONParser implements Closeable {
                     case '7':
                     case '8':
                     case '9':
-                        builder.append(curr);
+                        append(curr);
                         while (next0() >= '0' && curr <= '9') {
-                            builder.append(curr);
+                            append(curr);
                         }
                         break;
                     default:
@@ -199,11 +203,11 @@ public class JSONParser implements Closeable {
         switch (curr) {
             case 'e':
             case 'E':
-                builder.append(curr);
+                append(curr);
                 switch (next0()) {
                     case '+':
                     case '-':
-                        builder.append(curr);
+                        append(curr);
                         switch (next0()) {
                             case '0':
                             case '1':
@@ -215,7 +219,7 @@ public class JSONParser implements Closeable {
                             case '7':
                             case '8':
                             case '9':
-                                builder.append(curr);
+                                append(curr);
                                 break;
                             default:
                                 throw new JSONParserException("Expected '0'~'9' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
@@ -232,13 +236,13 @@ public class JSONParser implements Closeable {
                     case '7':
                     case '8':
                     case '9':
-                        builder.append(curr);
+                        append(curr);
                         break;
                     default:
                         throw new JSONParserException("Expected '+','-','0'~'9' but " + (curr == EOF ? "EOF" : "'" + curr + "'"));
                 }
                 while (next0() >= '0' && curr <= '9') {
-                    builder.append(curr);
+                    append(curr);
                 }
                 break;
             default:
@@ -252,48 +256,48 @@ public class JSONParser implements Closeable {
                     next0();
                     continue;
                 default:
-                    return new BigDecimal(builder.toString());
+                    return new BigDecimal(new String(cbuf, 0, index));
             }
         }
     }
 
     private String parseString() throws JSONParserException, IOException {
-        builder.setLength(0);
+        index = 0;
         for (; ; ) {
             switch (next0()) {
                 case Constant.QUOTE:
                     next();
-                    return builder.toString();
+                    return new String(cbuf, 0, index);
                 case '\\':
                     switch (next0()) {
                         case Constant.QUOTE:
-                            builder.append('\"');
+                            append('\"');
                             continue;
                         case '\\':
-                            builder.append('\\');
+                            append('\\');
                             continue;
                         case 'n':
-                            builder.append('\n');
+                            append('\n');
                             continue;
                         case 't':
-                            builder.append('\t');
+                            append('\t');
                             continue;
                         case 'r':
-                            builder.append('\r');
+                            append('\r');
                             continue;
                         case '/':
-                            builder.append('/');
+                            append('/');
                             continue;
                         case 'u':
                             int s = Integer.parseInt(new String(new char[]{next0(), next0(), next0(), next0()}), 16);
-                            builder.append((char) s);
+                            append((char) s);
                             continue;
                         case 'b':
-                            builder.append('\b');
+                            append('\b');
                             continue;
                         case 'f':
                         case 'F':
-                            builder.append('\f');
+                            append('\f');
                             continue;
                         default:
                             throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
@@ -306,7 +310,7 @@ public class JSONParser implements Closeable {
                 case '\b':
                     throw new JSONParserException("Un-closed String");
                 default:
-                    builder.append(curr);
+                    append(curr);
                     continue;
             }
         }
@@ -359,5 +363,14 @@ public class JSONParser implements Closeable {
         if (input != null) {
             input.close();
         }
+    }
+
+    public void append(char c) {
+        if (index == cbuf.length) {
+            char[] newbuf = new char[cbuf.length * 2];
+            System.arraycopy(cbuf, 0, newbuf, 0, cbuf.length);
+            cbuf = newbuf;
+        }
+        cbuf[index++] = c;
     }
 }
