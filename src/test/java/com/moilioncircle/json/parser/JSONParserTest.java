@@ -312,6 +312,7 @@ public class JSONParserTest extends TestCase {
         try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("pass1.json")) {
             parse(stream);
         } catch (Exception e) {
+            e.printStackTrace();
             fail();
         }
     }
@@ -320,6 +321,7 @@ public class JSONParserTest extends TestCase {
         try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("pass2.json")) {
             parse(stream);
         } catch (Exception e){
+            e.printStackTrace();
             fail();
         }
     }
@@ -328,6 +330,7 @@ public class JSONParserTest extends TestCase {
         try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("pass3.json")) {
             parse(stream);
         } catch (Exception e) {
+            e.printStackTrace();
             fail();
         }
     }
