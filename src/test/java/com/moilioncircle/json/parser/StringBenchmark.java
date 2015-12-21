@@ -156,15 +156,15 @@ public class StringBenchmark {
         mapper.readTree(pass2);
     }
 
-//    @Benchmark
-//    public void testPass3TrimMyJSONParser() throws IOException, JSONParserException {
-//        ParserFactory.readTree(pass3_trim);
-//    }
-//
-//    @Benchmark
-//    public void testPass3TrimJacksonParser() throws IOException, JSONParserException {
-//        mapper.readTree(pass3_trim);
-//    }
+    @Benchmark
+    public void testPass3TrimMyJSONParser() throws IOException, JSONParserException {
+        ParserFactory.readTree(pass3_trim);
+    }
+
+    @Benchmark
+    public void testPass3TrimJacksonParser() throws IOException, JSONParserException {
+        mapper.readTree(pass3_trim);
+    }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
