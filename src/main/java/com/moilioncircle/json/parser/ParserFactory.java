@@ -1,11 +1,14 @@
 package com.moilioncircle.json.parser;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moilioncircle.json.parser.input.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.*;
 
 /**
  * Copyright leon
@@ -158,6 +161,117 @@ public class ParserFactory {
         try (JSONParser parser = new ParserBuilder().bytes(bytes).order(isOrdered).build()) {
             return parser.parse();
         }
+    }
+
+    public static String writeAsString(JSONType json){
+        if(json instanceof JSONArray){
+            return writeAsString((JSONArray) json);
+        }else if(json instanceof JSONObject){
+            return writeAsString((JSONObject) json);
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    private static String writeAsString(JSONObject map){
+        if(map == null || map.size() == 0){
+            return "{}";
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append('{');
+        Iterator<String> it = map.keySet().iterator();
+        while(it.hasNext()){
+            String key = it.next();
+            Object value = map.get(key);
+            builder.append("\""+escape(key)+"\":");
+            if(value == null){
+                builder.append("null");
+            }else if(value instanceof Map){
+                builder.append(writeAsString((JSONObject)value));
+            }else if(value instanceof Collection){
+                builder.append(writeAsString((JSONArray) value));
+            }else if(value instanceof String){
+                builder.append("\""+escape((String)value)+"\"");
+            }else {
+                builder.append(value);
+            }
+            if(it.hasNext()){
+                builder.append(',');
+            }
+        }
+        builder.append('}');
+        return builder.toString();
+    }
+
+    private static String writeAsString(JSONArray list){
+        if(list == null || list.size() == 0){
+            return "[]";
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append('[');
+        Iterator<Object> it = list.iterator();
+        while(it.hasNext()){
+            Object value = it.next();
+            if(value == null){
+                builder.append("null");
+            }else if(value instanceof Map){
+                builder.append(writeAsString((JSONObject)value));
+            }else if(value instanceof Collection){
+                builder.append(writeAsString((JSONArray) value));
+            }else if(value instanceof String){
+                builder.append("\""+escape((String)value)+"\"");
+            }else {
+                builder.append(value);
+            }
+            if(it.hasNext()){
+                builder.append(',');
+            }
+        }
+        builder.append(']');
+        return builder.toString();
+    }
+
+    public static String escape(String str){
+        StringBuilder builder = new StringBuilder();
+        char[] ary = str.toCharArray();
+        for(char c : ary){
+            switch (c){
+                case '"':
+                    builder.append('\\');
+                    builder.append('"');
+                    break;
+                case '\n':
+                    builder.append('\\');
+                    builder.append('n');
+                    break;
+                case '\\':
+                    builder.append('\\');
+                    builder.append('\\');
+                    break;
+                case '/':
+                    builder.append('\\');
+                    builder.append('/');
+                    break;
+                case '\b':
+                    builder.append('\\');
+                    builder.append('b');
+                    break;
+                case '\f':
+                    builder.append('\\');
+                    builder.append('f');
+                    break;
+                case '\r':
+                    builder.append('\\');
+                    builder.append('r');
+                    break;
+                case '\t':
+                    builder.append('\\');
+                    builder.append('t');
+                    break;
+                default:
+                    builder.append(c);
+            }
+        }
+        return builder.toString();
     }
 
 }
