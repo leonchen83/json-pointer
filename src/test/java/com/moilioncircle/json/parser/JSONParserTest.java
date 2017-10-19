@@ -6,10 +6,8 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
 public class JSONParserTest extends TestCase {
-
 
     public void testFail1() throws Exception {
         try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("fail1.json")) {

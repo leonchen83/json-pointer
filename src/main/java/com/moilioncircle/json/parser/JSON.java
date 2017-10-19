@@ -86,101 +86,161 @@ public class JSON {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(String jsonStr) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(String jsonStr) throws IOException {
         try (JSONParser parser = new ParserBuilder().string(jsonStr).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(Reader reader) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(Reader reader) throws IOException {
         try (JSONParser parser = new ParserBuilder().reader(reader).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(char[] chars) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(char[] chars) throws IOException {
         try (JSONParser parser = new ParserBuilder().chars(chars).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(InputStream stream) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(InputStream stream) throws IOException {
         try (JSONParser parser = new ParserBuilder().stream(stream).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(InputStream stream, String charset) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(InputStream stream, String charset) throws IOException {
         try (JSONParser parser = new ParserBuilder().stream(stream, Charset.forName(charset)).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(byte[] bytes, String charset) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(byte[] bytes, String charset) throws IOException {
         try (JSONParser parser = new ParserBuilder().bytes(bytes, Charset.forName(charset)).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(byte[] bytes) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(byte[] bytes) throws IOException {
         try (JSONParser parser = new ParserBuilder().bytes(bytes).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(String jsonStr, boolean isOrdered) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(String jsonStr, boolean isOrdered) throws IOException {
         try (JSONParser parser = new ParserBuilder().string(jsonStr).order(isOrdered).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(Reader reader, boolean isOrdered) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(Reader reader, boolean isOrdered) throws IOException {
         try (JSONParser parser = new ParserBuilder().reader(reader).order(isOrdered).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(char[] chars, boolean isOrdered) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(char[] chars, boolean isOrdered) throws IOException {
         try (JSONParser parser = new ParserBuilder().chars(chars).order(isOrdered).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(InputStream stream, boolean isOrdered) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(InputStream stream, boolean isOrdered) throws IOException {
         try (JSONParser parser = new ParserBuilder().stream(stream).order(isOrdered).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(InputStream stream, String charset, boolean isOrdered) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(InputStream stream, String charset, boolean isOrdered) throws IOException {
         try (JSONParser parser = new ParserBuilder().stream(stream, Charset.forName(charset)).order(isOrdered).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(byte[] bytes, String charset, boolean isOrdered) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(byte[] bytes, String charset, boolean isOrdered) throws IOException {
         try (JSONParser parser = new ParserBuilder().bytes(bytes, Charset.forName(charset)).order(isOrdered).build()) {
             return (T) parser.parse();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends JSONType> T readTree(byte[] bytes, boolean isOrdered) throws IOException, JSONParserException {
+    public static <T extends JSONType> T readTree(byte[] bytes, boolean isOrdered) throws IOException {
         try (JSONParser parser = new ParserBuilder().bytes(bytes).order(isOrdered).build()) {
             return (T) parser.parse();
         }
+    }
+
+    public static <T> T readPath(String path, String jsonStr) throws IOException {
+        return JSONPath.readPath(path, readTree(jsonStr));
+    }
+
+    public static <T> T readPath(String path, Reader reader) throws IOException {
+        return JSONPath.readPath(path, readTree(reader));
+    }
+
+    public static <T> T readPath(String path, char[] chars) throws IOException {
+        return JSONPath.readPath(path, readTree(chars));
+    }
+
+    public static <T> T readPath(String path, InputStream stream) throws IOException {
+        return JSONPath.readPath(path, readTree(stream));
+    }
+
+    public static <T> T readPath(String path, InputStream stream, String charset) throws IOException {
+        return JSONPath.readPath(path, readTree(stream, charset));
+    }
+
+    public static <T> T readPath(String path, byte[] bytes, String charset) throws IOException {
+        return JSONPath.readPath(path, readTree(bytes, charset));
+    }
+
+    public static <T> T readPath(String path, byte[] bytes) throws IOException {
+        return JSONPath.readPath(path, readTree(bytes));
+    }
+
+    public static <T> T readPath(String path, String jsonStr, boolean isOrdered) throws IOException {
+        return JSONPath.readPath(path, readTree(jsonStr, isOrdered));
+    }
+
+    public static <T> T readPath(String path, Reader reader, boolean isOrdered) throws IOException {
+        return JSONPath.readPath(path, readTree(reader, isOrdered));
+    }
+
+    public static <T> T readPath(String path, char[] chars, boolean isOrdered) throws IOException {
+        return JSONPath.readPath(path, readTree(chars, isOrdered));
+    }
+
+    public static <T> T readPath(String path, InputStream stream, boolean isOrdered) throws IOException {
+        return JSONPath.readPath(path, readTree(stream, isOrdered));
+    }
+
+    public static <T> T readPath(String path, InputStream stream, String charset, boolean isOrdered) throws IOException {
+        return JSONPath.readPath(path, readTree(stream, charset, isOrdered));
+    }
+
+    public static <T> T readPath(String path, byte[] bytes, String charset, boolean isOrdered) throws IOException {
+        return JSONPath.readPath(path, readTree(bytes, charset, isOrdered));
+    }
+
+    public static <T> T readPath(String path, byte[] bytes, boolean isOrdered) throws IOException {
+        return JSONPath.readPath(path, readTree(bytes, isOrdered));
+    }
+
+    public static <T> T readPath(String path, JSONType json) {
+        return JSONPath.readPath(path, json);
     }
 
     public static String writeAsString(JSONType json) {
