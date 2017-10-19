@@ -102,6 +102,6 @@ public class JSONArray implements JSONType, Collection<Object> {
 
     @SuppressWarnings("unchecked")
     <T> T get(int index) {
-        return (T)list.get(index);
+        return (T) list.get(index);
     }
 }

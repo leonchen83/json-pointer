@@ -318,7 +318,7 @@ public class JSONParserTest extends TestCase {
     public void testPass2() throws Exception {
         try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("pass2.json")) {
             parse(stream);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
