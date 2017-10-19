@@ -575,11 +575,11 @@ public class JSONParserTest extends TestCase {
         }
     }
 
-    private void parse(InputStream stream) throws IOException, JSONParserException {
+    private <T extends JSONType> T parse(InputStream stream) throws IOException, JSONParserException {
         byte[] bytes = IOUtils.toByteArray(stream);
         IOUtils.closeQuietly(stream);
         String str = new String(bytes);
         JSONParser parser = new JSONParser(new StringParserInput(str), true);
-        parser.parse();
+        return (T) parser.parse();
     }
 }

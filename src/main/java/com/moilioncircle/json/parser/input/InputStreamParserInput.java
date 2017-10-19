@@ -1,12 +1,5 @@
-package com.moilioncircle.json.parser.input;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-
-/**
- * Copyright leon
+/*
+ * Copyright 2015-2018 Leon Chen
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +12,16 @@ import java.nio.charset.Charset;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @author leon on 15-12-19
+ */
+package com.moilioncircle.json.parser.input;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+
+/**
+ * @author Leon Chen
  */
 public class InputStreamParserInput implements ParserInput {
 

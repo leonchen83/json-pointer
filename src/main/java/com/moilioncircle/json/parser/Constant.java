@@ -1,7 +1,5 @@
-package com.moilioncircle.json.parser;
-
-/**
- * Copyright leon
+/*
+ * Copyright 2015-2018 Leon Chen
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +12,11 @@ package com.moilioncircle.json.parser;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @author leon on 15-11-11
+ */
+package com.moilioncircle.json.parser;
+
+/**
+ * @author Leon Chen
  */
 public class Constant {
 

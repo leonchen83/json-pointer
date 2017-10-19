@@ -1,17 +1,5 @@
-package com.moilioncircle.json.parser;
-
-import com.moilioncircle.json.parser.input.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-
-/**
- * Copyright leon
+/*
+ * Copyright 2015-2018 Leon Chen
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +12,29 @@ import java.util.Map;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @author leon on 15-12-18
  */
-public class ParserFactory {
-    private ParserFactory() {
+package com.moilioncircle.json.parser;
+
+import com.moilioncircle.json.parser.input.ByteArrayParserInput;
+import com.moilioncircle.json.parser.input.CharArrayParserInput;
+import com.moilioncircle.json.parser.input.InputStreamParserInput;
+import com.moilioncircle.json.parser.input.ParserInput;
+import com.moilioncircle.json.parser.input.ReaderParserInput;
+import com.moilioncircle.json.parser.input.StringParserInput;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
+/**
+ * @author Leon Chen
+ */
+public class JSON {
+    private JSON() {
 
     }
 
@@ -79,122 +85,136 @@ public class ParserFactory {
         }
     }
 
-    public static JSONType readTree(String jsonStr) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(String jsonStr) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().string(jsonStr).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(Reader reader) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(Reader reader) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().reader(reader).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(char[] chars) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(char[] chars) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().chars(chars).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(InputStream stream) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(InputStream stream) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().stream(stream).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(InputStream stream, String charset) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(InputStream stream, String charset) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().stream(stream, Charset.forName(charset)).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(byte[] bytes, String charset) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(byte[] bytes, String charset) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().bytes(bytes, Charset.forName(charset)).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(byte[] bytes) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(byte[] bytes) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().bytes(bytes).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(String jsonStr, boolean isOrdered) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(String jsonStr, boolean isOrdered) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().string(jsonStr).order(isOrdered).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(Reader reader, boolean isOrdered) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(Reader reader, boolean isOrdered) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().reader(reader).order(isOrdered).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(char[] chars, boolean isOrdered) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(char[] chars, boolean isOrdered) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().chars(chars).order(isOrdered).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(InputStream stream, boolean isOrdered) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(InputStream stream, boolean isOrdered) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().stream(stream).order(isOrdered).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(InputStream stream, String charset, boolean isOrdered) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(InputStream stream, String charset, boolean isOrdered) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().stream(stream, Charset.forName(charset)).order(isOrdered).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(byte[] bytes, String charset, boolean isOrdered) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(byte[] bytes, String charset, boolean isOrdered) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().bytes(bytes, Charset.forName(charset)).order(isOrdered).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static JSONType readTree(byte[] bytes, boolean isOrdered) throws IOException, JSONParserException {
+    @SuppressWarnings("unchecked")
+    public static <T extends JSONType> T readTree(byte[] bytes, boolean isOrdered) throws IOException, JSONParserException {
         try (JSONParser parser = new ParserBuilder().bytes(bytes).order(isOrdered).build()) {
-            return parser.parse();
+            return (T) parser.parse();
         }
     }
 
-    public static String writeAsString(JSONType json){
-        if(json instanceof JSONArray){
+    public static String writeAsString(JSONType json) {
+        if (json instanceof JSONArray) {
             return writeAsString((JSONArray) json);
-        }else if(json instanceof JSONObject){
+        } else if (json instanceof JSONObject) {
             return writeAsString((JSONObject) json);
         }
         throw new UnsupportedOperationException();
     }
 
-    private static String writeAsString(JSONObject map){
-        if(map == null || map.size() == 0){
+    private static String writeAsString(JSONObject map) {
+        if (map == null || map.size() == 0) {
             return "{}";
         }
         StringBuilder builder = new StringBuilder();
         builder.append('{');
         Iterator<String> it = map.keySet().iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             String key = it.next();
             Object value = map.get(key);
-            builder.append("\""+escape(key)+"\":");
-            if(value == null){
+            builder.append("\"" + escape(key) + "\":");
+            if (value == null) {
                 builder.append("null");
-            }else if(value instanceof Map){
-                builder.append(writeAsString((JSONObject)value));
-            }else if(value instanceof Collection){
+            } else if (value instanceof Map) {
+                builder.append(writeAsString((JSONObject) value));
+            } else if (value instanceof Collection) {
                 builder.append(writeAsString((JSONArray) value));
-            }else if(value instanceof String){
-                builder.append("\""+escape((String)value)+"\"");
-            }else {
+            } else if (value instanceof String) {
+                builder.append("\"" + escape((String) value) + "\"");
+            } else {
                 builder.append(value);
             }
-            if(it.hasNext()){
+            if (it.hasNext()) {
                 builder.append(',');
             }
         }
@@ -202,27 +222,27 @@ public class ParserFactory {
         return builder.toString();
     }
 
-    private static String writeAsString(JSONArray list){
-        if(list == null || list.size() == 0){
+    private static String writeAsString(JSONArray list) {
+        if (list == null || list.size() == 0) {
             return "[]";
         }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
         Iterator<Object> it = list.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             Object value = it.next();
-            if(value == null){
+            if (value == null) {
                 builder.append("null");
-            }else if(value instanceof Map){
-                builder.append(writeAsString((JSONObject)value));
-            }else if(value instanceof Collection){
+            } else if (value instanceof Map) {
+                builder.append(writeAsString((JSONObject) value));
+            } else if (value instanceof Collection) {
                 builder.append(writeAsString((JSONArray) value));
-            }else if(value instanceof String){
-                builder.append("\""+escape((String)value)+"\"");
-            }else {
+            } else if (value instanceof String) {
+                builder.append("\"" + escape((String) value) + "\"");
+            } else {
                 builder.append(value);
             }
-            if(it.hasNext()){
+            if (it.hasNext()) {
                 builder.append(',');
             }
         }
@@ -230,11 +250,11 @@ public class ParserFactory {
         return builder.toString();
     }
 
-    public static String escape(String str){
+    private static String escape(String str) {
         StringBuilder builder = new StringBuilder();
         char[] ary = str.toCharArray();
-        for(char c : ary){
-            switch (c){
+        for (char c : ary) {
+            switch (c) {
                 case '"':
                     builder.append('\\');
                     builder.append('"');

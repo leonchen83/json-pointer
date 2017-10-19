@@ -1,15 +1,5 @@
-package com.moilioncircle.json.parser;
-
-import com.moilioncircle.json.parser.input.ParserInput;
-
-import java.io.Closeable;
-import java.io.IOException;
-import java.math.BigDecimal;
-
-import static com.moilioncircle.json.parser.Constant.*;
-
-/**
- * Copyright leon
+/*
+ * Copyright 2015-2018 Leon Chen
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +12,26 @@ import static com.moilioncircle.json.parser.Constant.*;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @author leon on 15-11-11
+ */
+package com.moilioncircle.json.parser;
+
+import com.moilioncircle.json.parser.input.ParserInput;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.math.BigDecimal;
+
+import static com.moilioncircle.json.parser.Constant.COLON;
+import static com.moilioncircle.json.parser.Constant.COMMA;
+import static com.moilioncircle.json.parser.Constant.EOF;
+import static com.moilioncircle.json.parser.Constant.LBRACE;
+import static com.moilioncircle.json.parser.Constant.LBRACKET;
+import static com.moilioncircle.json.parser.Constant.QUOTE;
+import static com.moilioncircle.json.parser.Constant.RBRACE;
+import static com.moilioncircle.json.parser.Constant.RBRACKET;
+
+/**
+ * @author Leon Chen
  */
 public class JSONParser implements Closeable {
 
@@ -296,11 +304,10 @@ public class JSONParser implements Closeable {
                             append('\b');
                             continue;
                         case 'f':
-                        case 'F':
                             append('\f');
                             continue;
                         default:
-                            throw new JSONParserException("Expected '\\','b','f','F','n','r','t','/','u' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
+                            throw new JSONParserException("Expected '\\','b','f','n','r','t','/','u' but " + (curr == Constant.EOF ? "EOF" : "'" + curr + "'"));
                     }
                 case Constant.EOF:
                 case '\n':

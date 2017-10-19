@@ -1,12 +1,5 @@
-package com.moilioncircle.json.parser;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-/**
- * Copyright leon
+/*
+ * Copyright 2015-2018 Leon Chen
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +12,16 @@ import java.util.List;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @author leon on 15-11-11
+ */
+package com.moilioncircle.json.parser;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * @author Leon Chen
  */
 public class JSONArray implements JSONType, Collection<Object> {
     private final List<Object> list;
@@ -31,9 +32,7 @@ public class JSONArray implements JSONType, Collection<Object> {
 
     @Override
     public String toString() {
-        return "JSONArray{" +
-                "list=" + list +
-                '}';
+        return JSON.writeAsString(this);
     }
 
     @Override
@@ -99,5 +98,10 @@ public class JSONArray implements JSONType, Collection<Object> {
     @Override
     public void clear() {
         list.clear();
+    }
+
+    @SuppressWarnings("unchecked")
+    <T> T get(int index) {
+        return (T)list.get(index);
     }
 }

@@ -1,9 +1,5 @@
-package com.moilioncircle.json.parser;
-
-import java.util.*;
-
-/**
- * Copyright leon
+/*
+ * Copyright 2015-2018 Leon Chen
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +12,19 @@ import java.util.*;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @author leon on 15-11-11
  */
-public class JSONObject implements JSONType,Map<String,Object> {
+package com.moilioncircle.json.parser;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @author Leon Chen
+ */
+public class JSONObject implements JSONType, Map<String, Object> {
     private final Map<String, Object> map;
 
     public JSONObject(boolean isOrdered) {
@@ -33,9 +38,7 @@ public class JSONObject implements JSONType,Map<String,Object> {
 
     @Override
     public String toString() {
-        return "JSONObject{" +
-                "map=" + map +
-                '}';
+        return JSON.writeAsString(this);
     }
 
     @Override
@@ -65,7 +68,7 @@ public class JSONObject implements JSONType,Map<String,Object> {
 
     @Override
     public Object put(String key, Object value) {
-        return map.put(key,value);
+        return map.put(key, value);
     }
 
     @Override

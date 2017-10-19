@@ -18,29 +18,29 @@ package com.moilioncircle.json.parser;
 /**
  * @author Leon Chen
  */
-public class JSONParserException extends RuntimeException {
+public class JSONPathException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    public JSONParserException() {
+    public JSONPathException() {
         super();
     }
 
-    public JSONParserException(String message) {
+    public JSONPathException(String message) {
         super(message);
     }
 
-    public JSONParserException(String message, Throwable cause) {
+    public JSONPathException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public JSONParserException(Throwable cause) {
+    public JSONPathException(Throwable cause) {
         super(cause);
     }
 
-    protected JSONParserException(String message, Throwable cause,
-                                  boolean enableSuppression,
-                                  boolean writableStackTrace) {
+    protected JSONPathException(String message, Throwable cause,
+                                boolean enableSuppression,
+                                boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }
