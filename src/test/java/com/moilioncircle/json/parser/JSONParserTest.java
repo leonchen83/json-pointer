@@ -165,9 +165,8 @@ public class JSONParserTest extends TestCase {
     public void testFail18() throws Exception {
         try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("fail18.json")) {
             parse(stream);
-            fail();
         } catch (Exception e) {
-
+            fail();
         }
     }
 
