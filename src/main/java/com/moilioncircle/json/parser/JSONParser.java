@@ -52,7 +52,7 @@ public class JSONParser implements Closeable {
         this.isOrdered = isOrdered;
     }
 
-    public JSONType parse() throws IOException, JSONParserException {
+    public JSONType parse() throws IOException {
         JSONType object;
         curr = next();
         switch (curr) {
@@ -71,7 +71,7 @@ public class JSONParser implements Closeable {
         return object;
     }
 
-    private JSONObject parseObject() throws IOException, JSONParserException {
+    private JSONObject parseObject() throws IOException {
         JSONObject object = new JSONObject(isOrdered);
         switch (curr) {
             case QUOTE:
@@ -90,7 +90,7 @@ public class JSONParser implements Closeable {
         }
     }
 
-    private JSONArray parseArray() throws IOException, JSONParserException {
+    private JSONArray parseArray() throws IOException {
         JSONArray array = new JSONArray();
         switch (curr) {
             case RBRACKET:
@@ -105,7 +105,7 @@ public class JSONParser implements Closeable {
         }
     }
 
-    private Object parseValue() throws IOException, JSONParserException {
+    private Object parseValue() throws IOException {
         switch (curr) {
             case LBRACE:
                 next();
@@ -151,7 +151,7 @@ public class JSONParser implements Closeable {
         }
     }
 
-    private Object parseNumber() throws IOException, JSONParserException {
+    private Object parseNumber() throws IOException {
         index = 0;
         switch (curr) {
             case '-':
@@ -269,7 +269,7 @@ public class JSONParser implements Closeable {
         }
     }
 
-    private String parseString() throws JSONParserException, IOException {
+    private String parseString() throws IOException {
         index = 0;
         for (; ; ) {
             switch (next0()) {
@@ -341,7 +341,7 @@ public class JSONParser implements Closeable {
         return curr = input.read();
     }
 
-    private void accept(char c) throws IOException, JSONParserException {
+    private void accept(char c) throws IOException {
         if (c == curr) {
             next();
         } else {
@@ -349,7 +349,7 @@ public class JSONParser implements Closeable {
         }
     }
 
-    private void accept0(char c) throws IOException, JSONParserException {
+    private void accept0(char c) throws IOException {
         if (c == curr) {
             next0();
         } else {
