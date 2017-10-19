@@ -57,7 +57,7 @@ public class JSONPath {
         } else if (json instanceof JSONObject) {
             JSONObject obj = (JSONObject) json;
             if (!obj.containsKey(p)) {
-                throw new JSONPathException("unmatched path ['" + raw + "'] at ['" + p + "']");
+                throw new JSONPathException("not found path ['" + raw + "'] at ['" + p + "']");
             }
             return readPath(raw, path, obj.get(p), ++index);
         } else {
