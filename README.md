@@ -1,4 +1,4 @@
-# json-parser  
+# JSON-pointer  
   
-A simple and fast json parser.  
-parse json to `Map<String,Object>` or `List<Object>`  
+An implementation of [RFC6901](https://tools.ietf.org/html/rfc6901)  
+
