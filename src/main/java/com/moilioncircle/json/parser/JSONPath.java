@@ -51,8 +51,8 @@ public class JSONPath {
             try {
                 int idx = Integer.parseInt(p);
                 return readPath(raw, path, ary.get(idx), ++index);
-            } catch (NumberFormatException e) {
-                throw new JSONPathException("unmatched path ['" + raw + "'] at ['" + p + "'], expect a valid number.");
+            } catch (Exception e) {
+                throw new JSONPathException("unmatched path ['" + raw + "'] at ['" + p + "'], expect a valid number.", e);
             }
         } else if (json instanceof JSONObject) {
             JSONObject obj = (JSONObject) json;
