@@ -262,7 +262,7 @@ public class JSON {
         while (it.hasNext()) {
             String key = it.next();
             Object value = map.get(key);
-            builder.append("\"" + escape(key) + "\":");
+            builder.append("\"" + JSONEscaper.escape(key) + "\":");
             if (value == null) {
                 builder.append("null");
             } else if (value instanceof Map) {
@@ -270,7 +270,7 @@ public class JSON {
             } else if (value instanceof Collection) {
                 builder.append(writeAsString((JSONArray) value));
             } else if (value instanceof String) {
-                builder.append("\"" + escape((String) value) + "\"");
+                builder.append("\"" + JSONEscaper.escape((String) value) + "\"");
             } else {
                 builder.append(value);
             }
@@ -298,7 +298,7 @@ public class JSON {
             } else if (value instanceof Collection) {
                 builder.append(writeAsString((JSONArray) value));
             } else if (value instanceof String) {
-                builder.append("\"" + escape((String) value) + "\"");
+                builder.append("\"" + JSONEscaper.escape((String) value) + "\"");
             } else {
                 builder.append(value);
             }
@@ -309,49 +309,4 @@ public class JSON {
         builder.append(']');
         return builder.toString();
     }
-
-    private static String escape(String str) {
-        StringBuilder builder = new StringBuilder();
-        char[] ary = str.toCharArray();
-        for (char c : ary) {
-            switch (c) {
-                case '"':
-                    builder.append('\\');
-                    builder.append('"');
-                    break;
-                case '\n':
-                    builder.append('\\');
-                    builder.append('n');
-                    break;
-                case '\\':
-                    builder.append('\\');
-                    builder.append('\\');
-                    break;
-                case '/':
-                    builder.append('\\');
-                    builder.append('/');
-                    break;
-                case '\b':
-                    builder.append('\\');
-                    builder.append('b');
-                    break;
-                case '\f':
-                    builder.append('\\');
-                    builder.append('f');
-                    break;
-                case '\r':
-                    builder.append('\\');
-                    builder.append('r');
-                    break;
-                case '\t':
-                    builder.append('\\');
-                    builder.append('t');
-                    break;
-                default:
-                    builder.append(c);
-            }
-        }
-        return builder.toString();
-    }
-
 }
