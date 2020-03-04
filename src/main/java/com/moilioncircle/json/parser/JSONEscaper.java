@@ -16,8 +16,6 @@
 
 package com.moilioncircle.json.parser;
 
-import java.io.OutputStream;
-
 /**
  * @author Baoyi Chen
  */
